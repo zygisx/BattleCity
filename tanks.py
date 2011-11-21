@@ -17,24 +17,10 @@ class Tank(Sprite):
         self.image = pygame.image.load(img_filename).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = pos
-        self.bullets = []
+        self.bullets = pygame.sprite.Group();
         self.bullet_time = 0;
         self.mode  = 0;
-    #END
-
-    def bullets_update(self, millis):
-        """ update all bullets of current tank """
-        for bullet in self.bullets:
-            bullet.update(0)
-            if bullet.pos[0]  < 0 or \
-                    bullet.pos[0] > self.area.right or \
-                    bullet.pos[1]  < 0 or \
-                    bullet.pos[1] > self.area.bottom:
-                self.bullets.pop(0)
-
-
-        self.bullet_time -= millis
-        #print self.bullet_time
+        self.alive = True
     #END
 
     def shot (self, millis):
@@ -52,7 +38,8 @@ class Tank(Sprite):
         else:
             pos.append( self.rect.centerx - self.rect.width/2)
             pos.append( self.rect.centery)
-        self.bullets.append(Bullet(self.screen,self.speed + 1, pos, self.mode))
+        self.bullets.add(Bullet(self.screen,self.speed + 1, pos, self.mode))
+
     #END
 
     def collision_detect(self, sprite):
@@ -115,6 +102,10 @@ class PlayerTank(Tank):
             self.__rotate(2)
         elif move[1] < 0:
             self.__rotate(0)
+
+        self.bullet_time -= millis
+        self.bullets.update(millis)
+        self.bullets.draw(self.screen)
     #END
 
     def __rotate (self, code):		# code 0, 1, 2, 3
@@ -173,6 +164,11 @@ class EnemyTank(Tank):
             self.rect.centerx -= move[0]*self.speed
         if self.rect.top  < 0 or  self.rect.bottom > self.area.bottom:
             self.rect.centery -= move[1]*self.speed
+
+        #bullets update
+        self.bullet_time -= millis
+        self.bullets.update(millis)
+        self.bullets.draw(self.screen)
 
         # shot
         self.shot(millis)

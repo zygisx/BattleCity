@@ -7,7 +7,7 @@ import pygame, sys
 from pygame.locals import *
 from random import randrange
 
-
+ENEMIES = 10
 SCREEN_RESOLUTION = 600, 600
 BG_COLOR = (255, 255, 255)
 TANK_FILE = "tank.png"
@@ -30,17 +30,19 @@ def main():
     sprite.add(tanks, player)
 
     i=0
-    while i <= 20:
+
+    while i < ENEMIES:
         enemy = (EnemyTank(screen, ENEMY_FILE, 2.0,  \
-			[60 + randrange(300), 60 + randrange(300)]))
+			[60 + randrange(500), 60 + randrange(500)]))
         if not pygame.sprite.spritecollideany(enemy, tanks):
             enemy.add(tanks, enemies)
             i+=1
-
-    while 1:
+    game_on = True
+    start = time()
+    while game_on:     #while player group contains any sprite
 
         time_passed = clock.tick(50)
-        screen.fill(BG_COLOR); print time_passed
+        screen.fill(BG_COLOR);
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
@@ -60,16 +62,31 @@ def main():
         else:
             sprite.update(time_passed, (0, 0), enemies)
 
-        # TODO bullets_update wia group not itterating enemies sprites
+        pygame.sprite.groupcollide(enemies, sprite.bullets, True, True)
         for enemy in enemies.sprites():
-            enemy.bullets_update(time_passed)
+            pygame.sprite.groupcollide(player, enemy.bullets, True, True)
 
         enemies.update(time_passed, tanks)
-        sprite.bullets_update(time_passed)
-
         tanks.draw(screen)
-
+        
         pygame.display.flip()
+
+        game_on = len(player) and len(enemies)
+
+    color = (200,0,0)
+    Font = pygame.font.Font(None,25)
+    text1 = Font.render('GAME OVER',1,color)
+    text2 = Font.render("Killed: {0}".format(ENEMIES - len(enemies)),1,color)
+    text3 = Font.render("You made this in {0} seconds".format(round(time() - start, 2)),1,color)
+    screen.blit(text1,(250,200))
+    screen.blit(text2,(260,250))
+    screen.blit(text3,(180,300))
+    while 1:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+        pygame.display.flip()
+    print "You made this in: ", time() - start
+    print "Killed: ", ENEMIES - len(enemies)
 
     return 0
 

@@ -9,30 +9,31 @@ class Bullet(Sprite):
         self.screen = screen
         self.area = screen.get_rect()
         self.speed = speed
-        self.pos = pos
-        self.mode = mode
-        #print self.pos
-        self.base_bullet = pygame.image.load("bullet.png").convert_alpha()
 
-        self.bullet = self.base_bullet.get_rect()
+        self.mode = mode
+        self.image = pygame.image.load("bullet.png").convert_alpha()
+
+        self.rect = self.image.get_rect()
+        self.rect.center = pos
 
     def update(self, millis):
 
         if self.mode == 0:
-            self.pos[1] -= self.speed
+            self.rect.centery -= self.speed
         elif self.mode == 1:
-            self.pos[0] += self.speed
+            self.rect.centerx += self.speed
         elif self.mode == 2:
-            self.pos[1] += self.speed
+            self.rect.centery += self.speed
         else:
-            self.pos[0] -= self.speed
+            self.rect.centerx -= self.speed
 
-        """
-        if self.pos[0]  < 0 or  self.pos[0] > self.area.right:
-        if self.pos[1]  < 0 or  self.pos[1] > self.area.bottom:
-        """
+        if self.rect.centerx  < 0 or \
+                self.rect.centerx > self.area.right or \
+                self.rect.centery  < 0 or \
+                self.rect.centery > self.area.bottom:
+            self.kill();
 
         #draw.rect(self.screen, (0, 0, 0), self.bullet, 0)
-        self.screen.blit(self.base_bullet, self.pos)
+        #self.screen.blit(self.image, self.rect.center)
 
     #END
