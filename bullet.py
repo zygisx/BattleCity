@@ -33,7 +33,4 @@ class Bullet(Sprite):
                 self.rect.centery > self.area.bottom:
             self.kill();
 
-        #draw.rect(self.screen, (0, 0, 0), self.bullet, 0)
-        #self.screen.blit(self.image, self.rect.center)
-
     #END

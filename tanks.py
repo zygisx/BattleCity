@@ -38,7 +38,7 @@ class Tank(Sprite):
         else:
             pos.append( self.rect.centerx - self.rect.width/2)
             pos.append( self.rect.centery)
-        self.bullets.add(Bullet(self.screen,self.speed + 1, pos, self.mode))
+        self.bullets.add(Bullet(self.screen,self.speed +1, pos, self.mode))
 
     #END
 
@@ -79,6 +79,7 @@ class PlayerTank(Tank):
 
     def update(self, millis, move, enem):
 
+        # move sprite
         self.rect.centerx += move[0]*self.speed
         self.rect.centery += move[1]*self.speed
 
@@ -103,6 +104,7 @@ class PlayerTank(Tank):
         elif move[1] < 0:
             self.__rotate(0)
 
+        # bullets
         self.bullet_time -= millis
         self.bullets.update(millis)
         self.bullets.draw(self.screen)
@@ -134,11 +136,16 @@ class EnemyTank(Tank):
         self.distance = 0
 
     def update(self, millis, tanks):
+        """
+
+        """
+        # check is distance complete
         if self.distance <= 0:
             self.distance = randrange(200)
             self._rotate(randrange(4))
         else: self.distance -= self.speed
 
+        # ---
         move = [0, 0]
         if self.mode == 0:
            move[1] -= 1
@@ -149,9 +156,10 @@ class EnemyTank(Tank):
         else:
             move[0] -= 1
 
-
+        # make move
         self.rect.centerx += self.speed * move[0]
         self.rect.centery += self.speed * move[1]
+
         # Collisions
         tanks.remove(self)
         if pygame.sprite.spritecollideany(self, tanks):
@@ -162,9 +170,11 @@ class EnemyTank(Tank):
         # screen out
         if self.rect.left  < 0 or  self.rect.right > self.area.right:
             self.rect.centerx -= move[0]*self.speed
+            self.distance = 0
         if self.rect.top  < 0 or  self.rect.bottom > self.area.bottom:
             self.rect.centery -= move[1]*self.speed
-
+            self.distance = 0
+            
         #bullets update
         self.bullet_time -= millis
         self.bullets.update(millis)

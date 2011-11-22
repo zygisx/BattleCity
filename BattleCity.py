@@ -1,17 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 __author__ = 'zee'
 
 from time import time
-
+from explosion import Explosion
 from tanks import *
 import pygame, sys
 from pygame.locals import *
 from random import randrange
 
-ENEMIES = 10
+ENEMIES = 15
 SCREEN_RESOLUTION = 600, 600
 BG_COLOR = (255, 255, 255)
 TANK_FILE = "tank.png"
 ENEMY_FILE = "enemy_tank.png"
+EXPLOSION = "explosion.png"
 
 
 def main():
@@ -25,6 +28,7 @@ def main():
     tanks =  pygame.sprite.Group()
     player =  pygame.sprite.Group()
     enemies = pygame.sprite.Group()
+    killed =  pygame.sprite.Group()
 
     sprite = PlayerTank(screen, TANK_FILE, 2.0)
     sprite.add(tanks, player)
@@ -37,9 +41,9 @@ def main():
         if not pygame.sprite.spritecollideany(enemy, tanks):
             enemy.add(tanks, enemies)
             i+=1
-    game_on = True
+
     start = time()
-    while game_on:     #while player group contains any sprite
+    while (player and enemies) or killed:     #while player group contains any sprite
 
         time_passed = clock.tick(50)
         screen.fill(BG_COLOR);
@@ -62,31 +66,36 @@ def main():
         else:
             sprite.update(time_passed, (0, 0), enemies)
 
-        pygame.sprite.groupcollide(enemies, sprite.bullets, True, True)
+        for die in pygame.sprite.groupcollide(enemies, sprite.bullets, False, True).keys():
+            killed.add(Explosion(EXPLOSION, screen, die.rect, 2))
+            die.kill()
+
         for enemy in enemies.sprites():
             pygame.sprite.groupcollide(player, enemy.bullets, True, True)
 
         enemies.update(time_passed, tanks)
+        killed.update(time_passed)
+
         tanks.draw(screen)
+
+        for ex in killed.sprites():
+            screen.blit(ex.image, ex.rect, ex.area)
         
         pygame.display.flip()
-
-        game_on = len(player) and len(enemies)
+    #END WHILE
 
     color = (200,0,0)
-    Font = pygame.font.Font(None,25)
+    Font = pygame.font.Font(None,30)
     text1 = Font.render('GAME OVER',1,color)
-    text2 = Font.render("Killed: {0}".format(ENEMIES - len(enemies)),1,color)
-    text3 = Font.render("You made this in {0} seconds".format(round(time() - start, 2)),1,color)
+    text2 = Font.render("KILLED: {0}".format(ENEMIES - len(enemies)),1,color)
+    text3 = Font.render("TIME {0} SECONDS".format(round(time() - start, 2)),1,color)
     screen.blit(text1,(250,200))
     screen.blit(text2,(260,250))
-    screen.blit(text3,(180,300))
+    screen.blit(text3,(220,300))
     while 1:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
         pygame.display.flip()
-    print "You made this in: ", time() - start
-    print "Killed: ", ENEMIES - len(enemies)
 
     return 0
 
