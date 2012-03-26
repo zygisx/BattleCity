@@ -3,6 +3,8 @@ __author__ = 'zee'
 from pygame.sprite import Sprite
 import pygame
 
+BULLET_FILE = r"resources/images/bullet.png"
+
 class Bullet(Sprite):
     def __init__(self, screen, speed, pos, mode):
         Sprite.__init__(self)
@@ -11,7 +13,7 @@ class Bullet(Sprite):
         self.speed = speed
 
         self.mode = mode
-        self.image = pygame.image.load("bullet.png").convert_alpha()
+        self.image = pygame.image.load(BULLET_FILE).convert_alpha()
 
         self.rect = self.image.get_rect()
         self.rect.center = pos

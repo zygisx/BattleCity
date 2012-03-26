@@ -12,13 +12,13 @@ from random import randrange
 ENEMIES = 20
 SCREEN_RESOLUTION = 1200, 700
 BG_COLOR = (255, 255, 255)
-TANK_FILE = "/resources/images/tank.png"
-ENEMY_FILE = "/resources/images/enemy_tank.png"
-EXPLOSION = "/resources/images/explosion.png"
-EXPLOSION2 = "/resources/images/exp2.png"
-EXPLOSION_SOUND = "/resources/sounds/explosion.ogg"
-FINAL_EXPLOSION_SOUND = "/resources/sounds/final_explosion.ogg"
-SHOT_SOUND_FILE = "/resources/sounds/shot.ogg"
+TANK_FILE = r"resources\images\tank.png"
+ENEMY_FILE = "resources/images/enemy_tank.png"
+EXPLOSION = "resources/images/explosion.png"
+EXPLOSION2 = "resources/images/exp2.png"
+EXPLOSION_SOUND = "resources/sounds/explosion.ogg"
+FINAL_EXPLOSION_SOUND = "resources/sounds/final_explosion.ogg"
+SHOT_SOUND_FILE = "resources/sounds/shot.ogg"
 TESTING = False
 
 def main():
