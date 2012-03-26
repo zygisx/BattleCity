@@ -7,6 +7,10 @@ from bullet import Bullet
 from pygame.sprite import Sprite
 from random import randrange
 
+#SHOT_SOUND_FILE = "shot2.wma"
+
+
+
 class Tank(Sprite):
     __metaclass__ = abc.ABCMeta
     def __init__(self, screen, img_filename, speed, pos):
@@ -23,7 +27,7 @@ class Tank(Sprite):
         self.alive = True
     #END
 
-    def shot (self, millis):
+    def shot (self, millis, speed):
         """ make a shot """
         pos = []
         if self.mode == 0:
@@ -38,7 +42,7 @@ class Tank(Sprite):
         else:
             pos.append( self.rect.centerx - self.rect.width/2)
             pos.append( self.rect.centery)
-        self.bullets.add(Bullet(self.screen,self.speed +1, pos, self.mode))
+        self.bullets.add(Bullet(self.screen,speed, pos, self.mode))
 
     #END
 
@@ -68,12 +72,12 @@ class PlayerTank(Tank):
     """
 
     """
-    def __init__(self, screen, img_filename, speed ):
+    def __init__(self, screen, img_filename, speed, shot_sound ):
         Tank.__init__(self, screen, img_filename, speed, [20.0,20.0])
 
+        self.shot_sound = shot_sound
         self.area = screen.get_rect()
         #self.__rotate(0)
-
     #END
 
 
@@ -118,9 +122,10 @@ class PlayerTank(Tank):
 
     def shot(self, millis):
         if self.bullet_time > 0: return
-        else: self.bullet_time = 400
+        else: self.bullet_time = 200
 
-        Tank.shot(self, millis)
+        self.shot_sound.play(); print "SUVIS"
+        Tank.shot(self, millis, self.speed + 10)
     #END
 
 
@@ -188,5 +193,5 @@ class EnemyTank(Tank):
         if self.bullet_time > 0: return
         else: self.bullet_time = randrange(200, 2000)
 
-        Tank.shot(self, millis)
+        Tank.shot(self, millis, self.speed + 1)
     #END
