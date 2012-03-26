@@ -3,22 +3,25 @@
 __author__ = 'zee'
 
 from time import time
-from explosion import Explosion
+from explosion import Explosion, FINAL_EXPLOSION
 from tanks import *
 import pygame, sys
 from pygame.locals import *
 from random import randrange
 
-ENEMIES = 15
-SCREEN_RESOLUTION = 600, 600
+ENEMIES = 20
+SCREEN_RESOLUTION = 1200, 700
 BG_COLOR = (255, 255, 255)
-TANK_FILE = "tank.png"
-ENEMY_FILE = "enemy_tank.png"
-EXPLOSION = "explosion.png"
-
+TANK_FILE = "/resources/images/tank.png"
+ENEMY_FILE = "/resources/images/enemy_tank.png"
+EXPLOSION = "/resources/images/explosion.png"
+EXPLOSION2 = "/resources/images/exp2.png"
+EXPLOSION_SOUND = "/resources/sounds/explosion.ogg"
+FINAL_EXPLOSION_SOUND = "/resources/sounds/final_explosion.ogg"
+SHOT_SOUND_FILE = "/resources/sounds/shot.ogg"
+TESTING = False
 
 def main():
-
     pygame.init();
     screen = pygame.display.set_mode(SCREEN_RESOLUTION)
 
@@ -30,14 +33,18 @@ def main():
     enemies = pygame.sprite.Group()
     killed =  pygame.sprite.Group()
 
-    sprite = PlayerTank(screen, TANK_FILE, 2.0)
+    #sound
+    shot_sound  = pygame.mixer.Sound(SHOT_SOUND_FILE)
+    explosion_sound = pygame.mixer.Sound(EXPLOSION_SOUND)
+
+    sprite = PlayerTank(screen, TANK_FILE, 2.0, shot_sound)
     sprite.add(tanks, player)
 
     i=0
 
     while i < ENEMIES:
         enemy = (EnemyTank(screen, ENEMY_FILE, 2.0,  \
-			[60 + randrange(500), 60 + randrange(500)]))
+			[20 + randrange(1150), 20 + randrange(650)]))
         if not pygame.sprite.spritecollideany(enemy, tanks):
             enemy.add(tanks, enemies)
             i+=1
@@ -67,11 +74,18 @@ def main():
             sprite.update(time_passed, (0, 0), enemies)
 
         for die in pygame.sprite.groupcollide(enemies, sprite.bullets, False, True).keys():
-            killed.add(Explosion(EXPLOSION, screen, die.rect, 2))
+            killed.add(Explosion(EXPLOSION, screen, die.rect, explosion_sound))
             die.kill()
 
-        for enemy in enemies.sprites():
-            pygame.sprite.groupcollide(player, enemy.bullets, True, True)
+        # works only for one player
+        if not TESTING:
+            for enemy in enemies.sprites():
+                if pygame.sprite.groupcollide(player, enemy.bullets, False, True):
+                    killed.add(Explosion(EXPLOSION2,
+                                         screen, sprite.rect,
+                                         pygame.mixer.Sound(FINAL_EXPLOSION_SOUND),
+                                         FINAL_EXPLOSION, 10 ))
+                    sprite.kill()
 
         enemies.update(time_passed, tanks)
         killed.update(time_passed)
@@ -92,9 +106,11 @@ def main():
     screen.blit(text1,(250,200))
     screen.blit(text2,(260,250))
     screen.blit(text3,(220,300))
+    #clock.delay(1000)
     while 1:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
+            #if event.type == pygame.KEY_DOWN: sys.exit()
         pygame.display.flip()
 
     return 0
