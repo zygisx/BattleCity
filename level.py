@@ -6,7 +6,12 @@ import pygame
 import os
 
 class Level():
-    pass
+
+    def __init__(self, level = 1):
+        self.level = level
+        self.map = Map(str(level)+".map")
+
+
 
 
 class Map():
@@ -63,7 +68,7 @@ class Map():
             x = 0
             y += Map.TILE_SIZE
         self.tile_rects = []
-        self.updateRects()
+        self.__updateRects()
         return True
     #END
 
@@ -88,7 +93,17 @@ class Map():
             return True
     #END
 
-    def updateRects(self):
+    def isCollideAndRemoveTile(self, rect):
+        index = rect.collidelist(self.tile_rects)
+        if index == -1:
+            return False
+        else:
+            self.map.pop(index)
+            self.tile_rects.pop(index)
+            return True
+
+
+    def __updateRects(self):
 
         for tile in self.map:
             if tile[0] in (self.TILE_BRICK, self.TILE_STEEL, self.TILE_WATER):

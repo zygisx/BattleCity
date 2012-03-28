@@ -10,7 +10,7 @@ from pygame.locals import *
 from random import randrange
 from level import Map
 
-ENEMIES = 5
+ENEMIES = 30
 SCREEN_RESOLUTION = 800, 600
 BG_COLOR = (0, 0, 0)
 TANK_FILE = r"resources\images\tank.png"
@@ -21,7 +21,7 @@ EXPLOSION_SOUND = "resources/sounds/explosion.ogg"
 FINAL_EXPLOSION_SOUND = "resources/sounds/final_explosion.ogg"
 SHOT_SOUND_FILE = "resources/sounds/shot.ogg"
 TILES_FILE_NAME = "resources/images/tiles.png"
-TESTING = True
+TESTING = False
 
 def main():
     pygame.init();
@@ -43,8 +43,8 @@ def main():
     map = Map(TILES_FILE_NAME);
     map.loadMap("1.map")
 
-    sprite = PlayerTank(screen, TANK_FILE, 2.0, shot_sound)
-    sprite.add(tanks, player)
+    player_sprite = PlayerTank(screen, TANK_FILE, 2.0, shot_sound)
+    player_sprite.add(tanks, player)
 
     i=0
 
@@ -56,7 +56,7 @@ def main():
             i+=1
 
     start = time()
-    while (player and enemies) or killed:     #while player group contains any sprite
+    while (player and enemies) or killed:     #while player group contains any player_sprite
 
         time_passed = clock.tick(50)
         screen.fill(BG_COLOR);
@@ -65,21 +65,21 @@ def main():
             if event.type == pygame.QUIT: sys.exit()
         keyPresses = pygame.key.get_pressed()
         if keyPresses[K_SPACE]:
-            sprite.shot(time_passed)
+            player_sprite.shot(time_passed)
         if keyPresses[K_UP]:
-            sprite.update(time_passed, (0, -1), enemies, map)
+            player_sprite.update(time_passed, (0, -1), enemies, map)
         elif keyPresses[K_DOWN]:
-            sprite.update(time_passed, (0, 1), enemies, map)
+            player_sprite.update(time_passed, (0, 1), enemies, map)
         elif keyPresses[K_LEFT]:
-            sprite.update(time_passed, (-1, 0), enemies, map)
+            player_sprite.update(time_passed, (-1, 0), enemies, map)
         elif keyPresses[K_RIGHT]:
-            sprite.update(time_passed, (1, 0), enemies, map)
+            player_sprite.update(time_passed, (1, 0), enemies, map)
         elif keyPresses[K_ESCAPE]:
             sys.exit()
         else:
-            sprite.update(time_passed, (0, 0), enemies, map)
+            player_sprite.update(time_passed, (0, 0), enemies, map)
 
-        for die in pygame.sprite.groupcollide(enemies, sprite.bullets, False, True).keys():
+        for die in pygame.sprite.groupcollide(enemies, player_sprite.bullets, False, True).keys():
             killed.add(Explosion(EXPLOSION, screen, die.rect, explosion_sound))
             die.kill()
 
@@ -88,10 +88,21 @@ def main():
             for enemy in enemies.sprites():
                 if pygame.sprite.groupcollide(player, enemy.bullets, False, True):
                     killed.add(Explosion(EXPLOSION2,
-                                         screen, sprite.rect,
+                                         screen, player_sprite.rect,
                                          pygame.mixer.Sound(FINAL_EXPLOSION_SOUND),
                                          FINAL_EXPLOSION, 10 ))
-                    sprite.kill()
+                    player_sprite.kill()
+
+        # is map damaged
+        for bullet in player_sprite.bullets.sprites():
+            if map.isCollideAndRemoveTile(bullet.rect):
+                bullet.kill()
+        for enemy in enemies.sprites():
+            for bullet in enemy.bullets.sprites():
+                if map.isCollideAndRemoveTile(bullet.rect):
+                    bullet.kill()
+
+
 
         enemies.update(time_passed, tanks, map)
         killed.update(time_passed)
