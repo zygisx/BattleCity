@@ -67,17 +67,17 @@ def main():
         if keyPresses[K_SPACE]:
             sprite.shot(time_passed)
         if keyPresses[K_UP]:
-            sprite.update(time_passed, (0, -1), enemies)
+            sprite.update(time_passed, (0, -1), enemies, map)
         elif keyPresses[K_DOWN]:
-            sprite.update(time_passed, (0, 1), enemies)
+            sprite.update(time_passed, (0, 1), enemies, map)
         elif keyPresses[K_LEFT]:
-            sprite.update(time_passed, (-1, 0), enemies)
+            sprite.update(time_passed, (-1, 0), enemies, map)
         elif keyPresses[K_RIGHT]:
-            sprite.update(time_passed, (1, 0), enemies)
+            sprite.update(time_passed, (1, 0), enemies, map)
         elif keyPresses[K_ESCAPE]:
             sys.exit()
         else:
-            sprite.update(time_passed, (0, 0), enemies)
+            sprite.update(time_passed, (0, 0), enemies, map)
 
         for die in pygame.sprite.groupcollide(enemies, sprite.bullets, False, True).keys():
             killed.add(Explosion(EXPLOSION, screen, die.rect, explosion_sound))

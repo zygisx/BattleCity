@@ -41,6 +41,8 @@ class Map():
         self.tile_water2= tile_images[5]
         self.tile_froze = tile_images[6]
 
+        self.tile_rects = []
+
 
 
     def loadMap(self, filename):
@@ -60,7 +62,8 @@ class Map():
                 x += Map.TILE_SIZE
             x = 0
             y += Map.TILE_SIZE
-
+        self.tile_rects = []
+        self.updateRects()
         return True
     #END
 
@@ -76,4 +79,18 @@ class Map():
             elif tile[0] == Map.TILE_GRASS:
                 pass
 
+    #END
+
+    def isCollideWithMap(self, rect):
+        if rect.collidelist(self.tile_rects) == -1:
+            return False
+        else:
+            return True
+    #END
+
+    def updateRects(self):
+
+        for tile in self.map:
+            if tile[0] in (self.TILE_BRICK, self.TILE_STEEL, self.TILE_WATER):
+                self.tile_rects.append(tile[1])
     #END

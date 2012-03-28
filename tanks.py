@@ -81,14 +81,19 @@ class PlayerTank(Tank):
     #END
 
 
-    def update(self, millis, move, enem):
+    def update(self, millis, move, enem, map):
 
         # move sprite
         self.rect.centerx += move[0]*self.speed
         self.rect.centery += move[1]*self.speed
 
-        #collisions
+        #enemy collisions
         if pygame.sprite.spritecollideany(self, enem):
+            self.rect.centerx -= move[0]*self.speed
+            self.rect.centery -= move[1]*self.speed
+
+        #map collisions
+        if map.isCollideWithMap(self.rect):
             self.rect.centerx -= move[0]*self.speed
             self.rect.centery -= move[1]*self.speed
 
