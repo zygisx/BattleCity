@@ -145,7 +145,7 @@ class EnemyTank(Tank):
         self.area = screen.get_rect()
         self.distance = 0
 
-    def update(self, millis, tanks):
+    def update(self, millis, tanks, map):
         """
 
         """
@@ -170,12 +170,18 @@ class EnemyTank(Tank):
         self.rect.centerx += self.speed * move[0]
         self.rect.centery += self.speed * move[1]
 
-        # Collisions
+        #other tanks Collisions
         tanks.remove(self)
         if pygame.sprite.spritecollideany(self, tanks):
             self.rect.centerx -= move[0]*self.speed
             self.rect.centery -= move[1]*self.speed
         tanks.add(self)
+
+        #map collision
+        if map.isCollideWithMap(self.rect):
+            self.rect.centerx -= move[0]*self.speed
+            self.rect.centery -= move[1]*self.speed
+            self.distance = 0
 
         # screen out
         if self.rect.left  < 0 or  self.rect.right > self.area.right:

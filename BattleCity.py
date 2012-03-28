@@ -12,7 +12,7 @@ from level import Map
 
 ENEMIES = 5
 SCREEN_RESOLUTION = 800, 600
-BG_COLOR = (255, 255, 255)
+BG_COLOR = (0, 0, 0)
 TANK_FILE = r"resources\images\tank.png"
 ENEMY_FILE = "resources/images/enemy_tank.png"
 EXPLOSION = "resources/images/explosion.png"
@@ -51,7 +51,7 @@ def main():
     while i < ENEMIES:
         enemy = (EnemyTank(screen, ENEMY_FILE, 2.0,  \
 			[20 + randrange(SCREEN_RESOLUTION[0] - 50), 20 + randrange(SCREEN_RESOLUTION[1] - 50)]))
-        if not pygame.sprite.spritecollideany(enemy, tanks):
+        if not pygame.sprite.spritecollideany(enemy, tanks) and not map.isCollideWithMap(enemy.rect):
             enemy.add(tanks, enemies)
             i+=1
 
@@ -93,7 +93,7 @@ def main():
                                          FINAL_EXPLOSION, 10 ))
                     sprite.kill()
 
-        enemies.update(time_passed, tanks)
+        enemies.update(time_passed, tanks, map)
         killed.update(time_passed)
 
         tanks.draw(screen)
