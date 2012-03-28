@@ -8,9 +8,10 @@ from tanks import *
 import pygame, sys
 from pygame.locals import *
 from random import randrange
+from level import Map
 
-ENEMIES = 20
-SCREEN_RESOLUTION = 1200, 700
+ENEMIES = 5
+SCREEN_RESOLUTION = 800, 600
 BG_COLOR = (255, 255, 255)
 TANK_FILE = r"resources\images\tank.png"
 ENEMY_FILE = "resources/images/enemy_tank.png"
@@ -19,7 +20,8 @@ EXPLOSION2 = "resources/images/exp2.png"
 EXPLOSION_SOUND = "resources/sounds/explosion.ogg"
 FINAL_EXPLOSION_SOUND = "resources/sounds/final_explosion.ogg"
 SHOT_SOUND_FILE = "resources/sounds/shot.ogg"
-TESTING = False
+TILES_FILE_NAME = "resources/images/tiles.png"
+TESTING = True
 
 def main():
     pygame.init();
@@ -37,6 +39,10 @@ def main():
     shot_sound  = pygame.mixer.Sound(SHOT_SOUND_FILE)
     explosion_sound = pygame.mixer.Sound(EXPLOSION_SOUND)
 
+    #map
+    map = Map(TILES_FILE_NAME);
+    map.loadMap("1.map")
+
     sprite = PlayerTank(screen, TANK_FILE, 2.0, shot_sound)
     sprite.add(tanks, player)
 
@@ -44,7 +50,7 @@ def main():
 
     while i < ENEMIES:
         enemy = (EnemyTank(screen, ENEMY_FILE, 2.0,  \
-			[20 + randrange(1150), 20 + randrange(650)]))
+			[20 + randrange(SCREEN_RESOLUTION[0] - 50), 20 + randrange(SCREEN_RESOLUTION[1] - 50)]))
         if not pygame.sprite.spritecollideany(enemy, tanks):
             enemy.add(tanks, enemies)
             i+=1
@@ -91,6 +97,7 @@ def main():
         killed.update(time_passed)
 
         tanks.draw(screen)
+        map.drawMap(screen)
 
         for ex in killed.sprites():
             screen.blit(ex.image, ex.rect, ex.area)
