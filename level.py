@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from numpy import tile
+from pytz import _CountryTimezoneDict
 
 __author__ = 'zee'
 
@@ -41,7 +42,7 @@ class Map():
         tile_images = [
             tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE),
-            tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
+            tiles.subsurface(Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, 0, 8*2, 8*2),
             tiles.subsurface(0, 0, 8*2, 8*2),
@@ -50,7 +51,8 @@ class Map():
 
         self.tile_brick = tile_images[0]
         self.tile_steel = tile_images[1]
-        self.tile_grass = tile_images[3]
+        self.tile_grass = tile_images[2]
+
         self.tile_water = tile_images[4]
         self.tile_water1= tile_images[4]
         self.tile_water2= tile_images[5]
@@ -76,11 +78,12 @@ class Map():
                     self.map.append((Map.TILE_BRICK, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
                 elif col == "@":
                     self.map.append((Map.TILE_STEEL, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
+                elif col == '%':
+                    self.map.append((Map.TILE_GRASS, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
                 x += Map.TILE_SIZE
 
             x = 0
             y += Map.TILE_SIZE
-        self.tile_rects = []
         self.__updateRects()
         return True
     #END
@@ -95,15 +98,16 @@ class Map():
             elif tile[0] == Map.TILE_STEEL:
                 screen.blit(self.tile_steel, tile[1].topleft)
             elif tile[0] == Map.TILE_GRASS:
-                pass
+                screen.blit(self.tile_grass, tile[1].topleft)
 
     #END
 
     def isCollideWithMap(self, rect):
-        if rect.collidelist(self.tile_rects) == -1:
+        index = rect.collidelist(self.tile_rects)
+        if  index == -1:
             return False
         else:
-            return True
+             return True
     #END
 
     def isBulletCollideWithMap(self, rect):
@@ -119,8 +123,8 @@ class Map():
 
 
     def __updateRects(self):
-
+        self.tile_rects = []
         for tile in self.map:
-            if tile[0] in (self.TILE_BRICK, self.TILE_STEEL, self.TILE_WATER):
+            if tile[0] in (self.TILE_BRICK, self.TILE_STEEL, self.TILE_WATER, self.TILE_GRASS):
                 self.tile_rects.append(tile[1])
     #END
