@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 from numpy import tile
 
 __author__ = 'zee'
@@ -8,9 +9,20 @@ import os
 class Level():
 
     def __init__(self, level = 1):
-        self.level = level
-        self.map = Map(str(level)+".map")
+        self.__level = level
+        from BattleCity import TILES_FILE_NAME
+        self.__map = Map(TILES_FILE_NAME)
+        self.__map.loadMap(str(level) + ".map")
 
+    """
+    Getters
+    """
+    @property
+    def current_level(self):
+        return self.__level
+    @property
+    def map(self):
+        return self.__map
 
 
 
@@ -23,8 +35,6 @@ class Map():
 
     def __init__(self, tiles_filename):
         #self.map = []
-
-        #tiles = pygame.transform.scale(pygame.image.load("images/sprites.gif"), [192, 224])
 
         tiles = pygame.image.load(tiles_filename)
 
