@@ -40,7 +40,7 @@ class Map():
 
         tile_images = [
             tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
-            tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
+            tiles.subsurface(0, Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, 0, 8*2, 8*2),
@@ -74,7 +74,10 @@ class Map():
             for col in row:
                 if col == "#":
                     self.map.append((Map.TILE_BRICK, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
+                elif col == "@":
+                    self.map.append((Map.TILE_STEEL, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
                 x += Map.TILE_SIZE
+
             x = 0
             y += Map.TILE_SIZE
         self.tile_rects = []
@@ -90,7 +93,7 @@ class Map():
             if tile[0] == Map.TILE_BRICK:
                 screen.blit(self.tile_brick, tile[1].topleft)
             elif tile[0] == Map.TILE_STEEL:
-                pass
+                screen.blit(self.tile_steel, tile[1].topleft)
             elif tile[0] == Map.TILE_GRASS:
                 pass
 
@@ -103,14 +106,16 @@ class Map():
             return True
     #END
 
-    def isCollideAndRemoveTile(self, rect):
+    def isBulletCollideWithMap(self, rect):
         index = rect.collidelist(self.tile_rects)
         if index == -1:
             return False
         else:
-            self.map.pop(index)
-            self.tile_rects.pop(index)
+            if (self.map[index][0] == Map.TILE_BRICK):
+                self.map.pop(index)
+                self.tile_rects.pop(index)
             return True
+
 
 
     def __updateRects(self):

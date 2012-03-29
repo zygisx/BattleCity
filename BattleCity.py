@@ -99,11 +99,11 @@ def main():
 
         # is map damaged
         for bullet in player_sprite.bullets.sprites():
-            if level.map.isCollideAndRemoveTile(bullet.rect):
+            if level.map.isBulletCollideWithMap(bullet.rect):
                 bullet.kill()
         for enemy in enemies.sprites():
             for bullet in enemy.bullets.sprites():
-                if level.map.isCollideAndRemoveTile(bullet.rect):
+                if level.map.isBulletCollideWithMap(bullet.rect):
                     bullet.kill()
 
 
