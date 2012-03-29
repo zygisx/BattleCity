@@ -9,10 +9,18 @@ from random import randrange
 
 #SHOT_SOUND_FILE = "shot2.wma"
 
+class Direction:
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
 
 
 class Tank(Sprite):
     __metaclass__ = abc.ABCMeta
+
+
+
     def __init__(self, screen, img_filename, speed, pos):
         Sprite.__init__(self)
         self.screen = screen
@@ -21,28 +29,28 @@ class Tank(Sprite):
         self.image = pygame.image.load(img_filename).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = pos
-        self.bullets = pygame.sprite.Group();
-        self.bullet_time = 0;
-        self.mode  = 0;
+        self.bullets = pygame.sprite.Group()
+        self.bullet_time = 0
+        self.direction  = Direction.UP
         self.alive = True
     #END
 
     def shot (self, millis, speed):
         """ make a shot """
         pos = []
-        if self.mode == 0:
+        if self.direction == Direction.UP:
             pos.append( self.rect.centerx)
             pos.append( self.rect.centery - self.rect.height/2 )
-        elif self.mode == 1:
+        elif self.direction == Direction.RIGHT:
             pos.append( self.rect.centerx + self.rect.width/2)
             pos.append( self.rect.centery)
-        elif self.mode == 2:
+        elif self.direction == Direction.DOWN:
             pos.append( self.rect.centerx)
             pos.append( self.rect.centery + self.rect.height/2)
         else:
             pos.append( self.rect.centerx - self.rect.width/2)
             pos.append( self.rect.centery)
-        self.bullets.add(Bullet(self.screen,speed, pos, self.mode))
+        self.bullets.add(Bullet(self.screen,speed, pos, self.direction))
 
     #END
 
@@ -51,14 +59,14 @@ class Tank(Sprite):
 
     #--- Private access ---
 
-    def _rotate (self, code):		# code 0, 1, 2, 3
+    def _rotate (self, direct):		# code 0, 1, 2, 3
         """
         rotate tank by code:
         0 - 0 deg, 1 - 90 deg, 2 - 180, 3 - 270;
         """
-        if self.mode != code:
-            self.image = transform.rotate(self.image, (self.mode - code)*90)
-            self.mode = code
+        if self.direction != direct:
+            self.image = transform.rotate(self.image, (self.direction - direct)*90)
+            self.direction = direct
     #END
 
      #--- Abstract methods ---
@@ -105,13 +113,13 @@ class PlayerTank(Tank):
 
         #rotate tank
         if move[0] > 0:
-            self.__rotate(1)
+            self.__rotate(Direction.RIGHT)
         elif move[0] < 0:
-            self.__rotate(3)
+            self.__rotate(Direction.LEFT)
         elif move[1] > 0:
-            self.__rotate(2)
+            self.__rotate(Direction.DOWN)
         elif move[1] < 0:
-            self.__rotate(0)
+            self.__rotate(Direction.UP)
 
         # bullets
         self.bullet_time -= millis
@@ -119,17 +127,17 @@ class PlayerTank(Tank):
         self.bullets.draw(self.screen)
     #END
 
-    def __rotate (self, code):		# code 0, 1, 2, 3
-        if self.mode != code:
-            self.image = transform.rotate(self.image, (self.mode - code)*90)
-            self.mode = code
+    def __rotate (self, direct):		# code 0, 1, 2, 3
+        if self.direction != direct:
+            self.image = transform.rotate(self.image, (self.direction - direct)*90)
+            self.direction = direct
     #END
 
     def shot(self, millis):
         if self.bullet_time > 0: return
         else: self.bullet_time = 200
 
-        self.shot_sound.play(); print "SUVIS"
+        self.shot_sound.play() #print "SUVIS"
         Tank.shot(self, millis, self.speed + 10)
     #END
 
@@ -157,11 +165,11 @@ class EnemyTank(Tank):
 
         # ---
         move = [0, 0]
-        if self.mode == 0:
+        if self.direction == Direction.UP:
            move[1] -= 1
-        elif self.mode == 1:
+        elif self.direction == Direction.RIGHT:
             move[0] += 1
-        elif self.mode == 2:
+        elif self.direction == Direction.DOWN:
             move[1] += 1
         else:
             move[0] -= 1
@@ -175,6 +183,7 @@ class EnemyTank(Tank):
         if pygame.sprite.spritecollideany(self, tanks):
             self.rect.centerx -= move[0]*self.speed
             self.rect.centery -= move[1]*self.speed
+            self.distance = 0
         tanks.add(self)
 
         #map collision
