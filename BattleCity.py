@@ -12,9 +12,9 @@ from pygame.locals import *
 from random import randrange
 from level import *
 
-ENEMIES = 3
+ENEMIES = 30
 SCREEN_RESOLUTION = 800, 600
-BG_COLOR = (0, 0, 0)
+BG_COLOR = (15, 15, 15)
 TANK_FILE = r"resources\images\tank.png"
 ENEMY_FILE = "resources/images/enemy_tank.png"
 EXPLOSION = "resources/images/explosion.png"

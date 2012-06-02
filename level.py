@@ -1,6 +1,6 @@
-from argparse import ArgumentParser
-from numpy import tile
-from pytz import _CountryTimezoneDict
+#from argparse import ArgumentParser
+#from numpy import tile
+#from pytz import _CountryTimezoneDict
 
 __author__ = 'zee'
 
@@ -30,6 +30,10 @@ class Level():
 class Map():
     (TILE_EMPTY, TILE_BRICK, TILE_STEEL, TILE_WATER, TILE_GRASS, TILE_FROZE) = range(6)
 
+    DESTRUCTABLE = (TILE_BRICK, )
+    BULLET_STOPPER = (TILE_BRICK, TILE_STEEL, )
+    WALL = (TILE_BRICK, TILE_STEEL, TILE_WATER, )
+
     TILE_SIZE = 20;
 
 
@@ -43,7 +47,7 @@ class Map():
             tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE),
-            tiles.subsurface(0, 0, Map.TILE_SIZE, Map.TILE_SIZE),
+            tiles.subsurface(2*Map.TILE_SIZE, 0, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, 0, 8*2, 8*2),
             tiles.subsurface(0, 0, 8*2, 8*2),
             tiles.subsurface(0, 0, 8*2, 8*2)
@@ -52,8 +56,8 @@ class Map():
         self.tile_brick = tile_images[0]
         self.tile_steel = tile_images[1]
         self.tile_grass = tile_images[2]
+        self.tile_water = tile_images[3]
 
-        self.tile_water = tile_images[4]
         self.tile_water1= tile_images[4]
         self.tile_water2= tile_images[5]
         self.tile_froze = tile_images[6]
@@ -80,6 +84,9 @@ class Map():
                     self.map.append((Map.TILE_STEEL, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
                 elif col == '%':
                     self.map.append((Map.TILE_GRASS, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
+                elif col == '$':
+                    self.map.append((Map.TILE_WATER, pygame.Rect(x, y, Map.TILE_SIZE, Map.TILE_SIZE)))
+
                 x += Map.TILE_SIZE
 
             x = 0
@@ -99,15 +106,17 @@ class Map():
                 screen.blit(self.tile_steel, tile[1].topleft)
             elif tile[0] == Map.TILE_GRASS:
                 screen.blit(self.tile_grass, tile[1].topleft)
+            elif tile[0] == Map.TILE_WATER:
+                screen.blit(self.tile_water, tile[1].topleft)
 
     #END
 
     def isCollideWithMap(self, rect):
-        index = rect.collidelist(self.tile_rects)
-        if  index == -1:
-            return False
-        else:
-             return True
+        for tile in self.map:
+            if tile[0] in Map.WALL:
+                if tile[1].colliderect(rect):
+                    return True
+        return False
     #END
 
     def isBulletCollideWithMap(self, rect):
@@ -115,10 +124,13 @@ class Map():
         if index == -1:
             return False
         else:
-            if (self.map[index][0] == Map.TILE_BRICK):
+            if self.map[index][0] == Map.TILE_BRICK:
                 self.map.pop(index)
                 self.tile_rects.pop(index)
-            return True
+                return True
+            elif self.map[index][0] in Map.BULLET_STOPPER:
+                return True
+        return False
 
 
 

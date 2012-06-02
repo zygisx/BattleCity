@@ -137,7 +137,7 @@ class PlayerTank(Tank):
         if self.bullet_time > 0: return
         else: self.bullet_time = 200
 
-        self.shot_sound.play() #print "SUVIS"
+        self.shot_sound.play()
         Tank.shot(self, millis, self.speed + 10)
     #END
 
