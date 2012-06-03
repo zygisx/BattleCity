@@ -80,8 +80,11 @@ class PlayerTank(Tank):
     """
 
     """
+
+    INIT_COORDINATES = [20.0, 20.0]
+
     def __init__(self, screen, img_filename, speed, shot_sound ):
-        Tank.__init__(self, screen, img_filename, speed, [20.0,20.0])
+        Tank.__init__(self, screen, img_filename, speed, PlayerTank.INIT_COORDINATES)
 
         self.shot_sound = shot_sound
         self.area = screen.get_rect()
@@ -127,10 +130,10 @@ class PlayerTank(Tank):
         self.bullets.draw(self.screen)
     #END
 
-    def __rotate (self, direct):		# code 0, 1, 2, 3
-        if self.direction != direct:
-            self.image = transform.rotate(self.image, (self.direction - direct)*90)
-            self.direction = direct
+    def __rotate (self, direction):
+        if self.direction != direction:
+            self.image = transform.rotate(self.image, (self.direction - direction)*90)
+            self.direction = direction
     #END
 
     def shot(self, millis):

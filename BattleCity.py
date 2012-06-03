@@ -12,7 +12,9 @@ from pygame.locals import *
 from random import randrange
 from level import *
 
-ENEMIES = 30
+ENEMIES = 10
+GOAL_TO_KILL = 100
+
 SCREEN_RESOLUTION = 800, 600
 BG_COLOR = (15, 15, 15)
 TANK_FILE = r"resources\images\tank.png"
@@ -43,6 +45,7 @@ def main():
 
     #map
     level = Level()
+    killed_count = 0
 
     #map = Map(TILES_FILE_NAME);
     #map.loadMap("1.map")
@@ -54,7 +57,7 @@ def main():
 
     while i < ENEMIES:
         enemy = (EnemyTank(screen, ENEMY_FILE, 2.0,  \
-			[20 + randrange(SCREEN_RESOLUTION[0] - 50), 20 + randrange(SCREEN_RESOLUTION[1] - 50)]))
+			[20 + randrange(SCREEN_RESOLUTION[0] - 50), 20]))
         if not pygame.sprite.spritecollideany(enemy, tanks) and not level.map.isCollideWithMap(enemy.rect):
             enemy.add(tanks, enemies)
             i+=1
@@ -68,24 +71,28 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
         keyPresses = pygame.key.get_pressed()
-        if keyPresses[K_SPACE]:
-            player_sprite.shot(time_passed)
-        if keyPresses[K_UP]:
-            player_sprite.update(time_passed, (0, -1), enemies, level.map)
-        elif keyPresses[K_DOWN]:
-            player_sprite.update(time_passed, (0, 1), enemies, level.map)
-        elif keyPresses[K_LEFT]:
-            player_sprite.update(time_passed, (-1, 0), enemies, level.map)
-        elif keyPresses[K_RIGHT]:
-            player_sprite.update(time_passed, (1, 0), enemies, level.map)
-        elif keyPresses[K_ESCAPE]:
-            sys.exit()
-        else:
-            player_sprite.update(time_passed, (0, 0), enemies, level.map)
+        # if player not killed
+        if player:
+            if keyPresses[K_SPACE]:
+                player_sprite.shot(time_passed)
+            if keyPresses[K_UP]:
+                player_sprite.update(time_passed, (0, -1), enemies, level.map)
+            elif keyPresses[K_DOWN]:
+                player_sprite.update(time_passed, (0, 1), enemies, level.map)
+            elif keyPresses[K_LEFT]:
+                player_sprite.update(time_passed, (-1, 0), enemies, level.map)
+            elif keyPresses[K_RIGHT]:
+                player_sprite.update(time_passed, (1, 0), enemies, level.map)
+            elif keyPresses[K_ESCAPE]:
+                sys.exit()
+            else:
+                player_sprite.update(time_passed, (0, 0), enemies, level.map)
+
 
         for die in pygame.sprite.groupcollide(enemies, player_sprite.bullets, False, True).keys():
             killed.add(Explosion(EXPLOSION, screen, die.rect, explosion_sound))
             die.kill()
+            killed_count += 1
 
         # works only for one player
         if not TESTING:
@@ -106,8 +113,17 @@ def main():
                 if level.map.isBulletCollideWithMap(bullet.rect):
                     bullet.kill()
 
+        #chack if new enemies needed
+        if len(enemies) < ENEMIES and killed_count <= GOAL_TO_KILL - ENEMIES:
+            i = 0
+            while i < ENEMIES - len(enemies):
+                enemy = (EnemyTank(screen, ENEMY_FILE, 2.0,\
+                    [20 + randrange(SCREEN_RESOLUTION[0] - 50), 20]))
+                if not pygame.sprite.spritecollideany(enemy, tanks) and not level.map.isCollideWithMap(enemy.rect):
+                    enemy.add(tanks, enemies)
+                    i+=1
 
-
+        #updates
         enemies.update(time_passed, tanks, level.map)
         killed.update(time_passed)
 
@@ -123,7 +139,7 @@ def main():
     color = (200,0,0)
     Font = pygame.font.Font(None,30)
     text1 = Font.render('GAME OVER',1,color)
-    text2 = Font.render("KILLED: {0}".format(ENEMIES - len(enemies)),1,color)
+    text2 = Font.render("KILLED: {0}".format(killed_count),1,color)
     text3 = Font.render("TIME {0} SECONDS".format(round(time() - start, 2)),1,color)
     screen.blit(text1,(250,200))
     screen.blit(text2,(260,250))
