@@ -6,6 +6,9 @@ __author__ = 'zee'
 
 import pygame
 import os
+import random
+
+import BattleCity
 
 class Level():
 
@@ -13,7 +16,7 @@ class Level():
         self.__level = level
         from BattleCity import TILES_FILE_NAME
         self.__map = Map(TILES_FILE_NAME)
-        self.__map.loadMap(str(level) + ".map")
+        self.__map.loadMap(BattleCity.MAPS_DIR + str(level) + ".map")
 
     """
     Getters
@@ -48,7 +51,7 @@ class Map():
             tiles.subsurface(0, Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(2*Map.TILE_SIZE, 0, Map.TILE_SIZE, Map.TILE_SIZE),
-            tiles.subsurface(0, 0, 8*2, 8*2),
+            tiles.subsurface(3*Map.TILE_SIZE, 0, Map.TILE_SIZE, Map.TILE_SIZE),
             tiles.subsurface(0, 0, 8*2, 8*2),
             tiles.subsurface(0, 0, 8*2, 8*2)
         ]
@@ -57,9 +60,10 @@ class Map():
         self.tile_steel = tile_images[1]
         self.tile_grass = tile_images[2]
         self.tile_water = tile_images[3]
-
         self.tile_water1= tile_images[4]
+
         self.tile_water2= tile_images[5]
+
         self.tile_froze = tile_images[6]
 
         self.tile_rects = []
@@ -98,6 +102,7 @@ class Map():
     def drawMap(self, screen):
         """ draw map on specific surface
         """
+        water = 0
 
         for tile in self.map:
             if tile[0] == Map.TILE_BRICK:
@@ -107,7 +112,10 @@ class Map():
             elif tile[0] == Map.TILE_GRASS:
                 screen.blit(self.tile_grass, tile[1].topleft)
             elif tile[0] == Map.TILE_WATER:
-                screen.blit(self.tile_water, tile[1].topleft)
+                if random.randrange(1):
+                    screen.blit(self.tile_water, tile[1].topleft)
+                else:
+                    screen.blit(self.tile_water1, tile[1].topleft)
 
     #END
 

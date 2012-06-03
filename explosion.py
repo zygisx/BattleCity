@@ -64,7 +64,7 @@ class Explosion(pygame.sprite.Sprite):
 
 class FinalExplosion(pygame.sprite.Sprite):
 
-    def __init__(self, image, screen, rect, fps = 10):
+    def __init__(self, image, screen, rect, fps = 2):
         self.screen = screen
         self._frame = 0
         self._delay = 1000/fps
@@ -74,5 +74,3 @@ class FinalExplosion(pygame.sprite.Sprite):
         self.area = pygame.rect.Rect(self._areas[self._frame])
         self.rect = pygame.Rect(rect)
     #END
-        
-        
