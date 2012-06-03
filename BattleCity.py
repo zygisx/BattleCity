@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from calendar import _localized_month
+
 __author__ = 'zee'
 
 # sys.path.append(r"d:\ws\python\pygame\tankgame")
@@ -12,12 +14,12 @@ from pygame.locals import *
 from random import randrange
 from level import *
 
-ENEMIES = 10
+ENEMIES = 3
 GOAL_TO_KILL = 100
 
 SCREEN_RESOLUTION = 800, 600
 BG_COLOR = (15, 15, 15)
-TANK_FILE = r"resources\images\tank.png"
+TANK_FILE = "resources/images/tank.png"
 ENEMY_FILE = "resources/images/enemy_tank.png"
 EXPLOSION = "resources/images/explosion.png"
 EXPLOSION2 = "resources/images/exp2.png"
@@ -25,6 +27,7 @@ EXPLOSION_SOUND = "resources/sounds/explosion.ogg"
 FINAL_EXPLOSION_SOUND = "resources/sounds/final_explosion.ogg"
 SHOT_SOUND_FILE = "resources/sounds/shot.ogg"
 TILES_FILE_NAME = "resources/images/tiles.png"
+MAPS_DIR = "maps/"
 TESTING = False
 
 def main():

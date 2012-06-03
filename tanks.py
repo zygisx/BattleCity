@@ -81,7 +81,7 @@ class PlayerTank(Tank):
 
     """
 
-    INIT_COORDINATES = [20.0, 20.0]
+    INIT_COORDINATES = [20.0, 580.0]
 
     def __init__(self, screen, img_filename, speed, shot_sound ):
         Tank.__init__(self, screen, img_filename, speed, PlayerTank.INIT_COORDINATES)
